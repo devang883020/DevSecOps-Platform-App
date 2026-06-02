@@ -825,7 +825,7 @@ terraform destroy -var-file=variables.tfvars
 
 ## 👥 Authors
 
-- **Devang Kubde** — [@devang8830201](https://github.com/devang883020)
+- **Devang Kubde** — [@devang883020](https://github.com/devang883020)
 
 ---
 
