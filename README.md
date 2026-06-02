@@ -53,28 +53,28 @@ Developer pushes code
          │ webhook
          ▼
 ┌───────────────────────────────────────────────────┐
-│              Jenkins CI Pipeline (EC2)             │
+│              Jenkins CI Pipeline (EC2)            │
 │                                                   │
-│  Checkout → SonarQube → Quality Gate → OWASP     │
-│       → Trivy FS → Docker Build → Trivy Image    │
-│       → Push to ECR → Update Helm values.yaml    │
+│  Checkout → SonarQube → Quality Gate → OWASP      │
+│       → Trivy FS → Docker Build → Trivy Image     │
+│       → Push to ECR → Update Helm values.yaml     │
 └────────────────────┬──────────────────────────────┘
                      │ git push (image tag update)
                      ▼
 ┌───────────────────────────────────────────────────┐
 │               ArgoCD (in EKS)                     │
-│   Detects change → Renders Helm → Applies to EKS │
+│   Detects change → Renders Helm → Applies to EKS  │
 └────────────────────┬──────────────────────────────┘
                      │ deploy
                      ▼
 ┌───────────────────────────────────────────────────┐
 │                  AWS EKS Cluster                  │
 │                                                   │
-│   ┌─────────────┐  ┌─────────────┐  ┌──────────┐ │
-│   │  Frontend   │  │   Backend   │  │ Database │ │
+│   ┌─────────────┐  ┌─────────────┐  ┌──────────┐  │
+│   │  Frontend   │  │   Backend   │  │ Database │  │
 │   │   (React)   │─▶│  (Node.js)  │─▶│ (MongoDB)│ │
-│   │   port 80   │  │  port 3500  │  │port 27017│ │
-│   └─────────────┘  └─────────────┘  └──────────┘ │
+│   │   port 80   │  │  port 3500  │  │port 27017│  │
+│   └─────────────┘  └─────────────┘  └──────────┘  │
 │                                                   │
 │   ┌───────────────────────────────────────────┐   │
 │   │     Prometheus + Grafana (monitoring)     │   │
