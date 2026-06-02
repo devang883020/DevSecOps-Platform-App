@@ -1,0 +1,367 @@
+/* ─── App background ─── */
+.app-bg {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #ddd6fe 100%);
+}
+
+/* ─── Main card ─── */
+.app-card {
+    width: 100%;
+    max-width: 540px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 32px rgba(83, 74, 183, 0.12), 0 1px 4px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+/* ─── Header ─── */
+.app-header {
+    background: linear-gradient(135deg, #534AB7 0%, #7c3aed 100%);
+    padding: 24px 24px 20px;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+}
+
+.cloud-badge {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    background: rgba(255,255,255,0.15);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* ─── Stats ─── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.stat-box {
+    background: rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.stat-num {
+    display: block;
+    font-size: 24px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.stat-num.stat-done {
+    color: #a7f3d0;
+}
+
+.stat-num.stat-active {
+    color: #fde68a;
+}
+
+.stat-lbl {
+    display: block;
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 4px;
+}
+
+/* ─── Progress bar ─── */
+.progress-track {
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 4px;
+    background: #a7f3d0;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.progress-label {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 6px;
+    text-align: right;
+}
+
+/* ─── Filter tabs ─── */
+.filter-tabs {
+    display: flex;
+    border-bottom: 1px solid #f3f4f6;
+    background: #fafafa;
+}
+
+.filter-tab {
+    flex: 1;
+    padding: 12px 8px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.filter-tab:hover {
+    color: #534AB7;
+}
+
+.filter-tab--active {
+    color: #534AB7;
+    border-bottom-color: #534AB7;
+}
+
+.filter-count {
+    font-size: 11px;
+    font-weight: 600;
+    background: #ede9fe;
+    color: #534AB7;
+    padding: 1px 7px;
+    border-radius: 20px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.filter-tab--active .filter-count {
+    background: #534AB7;
+    color: #ffffff;
+}
+
+/* ─── Input row ─── */
+.input-row {
+    display: flex;
+    gap: 10px;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.task-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #111827;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+}
+
+.task-input::placeholder {
+    color: #9ca3af;
+}
+
+.task-input:focus {
+    border-color: #534AB7;
+    box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.1);
+}
+
+.add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: #534AB7;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+    font-family: inherit;
+}
+
+.add-btn:hover {
+    background: #4338ca;
+}
+
+.add-btn:active {
+    transform: scale(0.97);
+}
+
+/* ─── Task list ─── */
+.task-list {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 80px;
+}
+
+/* ─── Task item ─── */
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 12px;
+    background: #ffffff;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.task-item:hover {
+    border-color: #e5e7eb;
+    background: #fafafa;
+}
+
+.task-item--done {
+    background: #fafafa;
+}
+
+/* ─── Checkbox ─── */
+.task-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #d1d5db;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+    padding: 0;
+}
+
+.task-check:hover {
+    border-color: #534AB7;
+}
+
+.task-check--done {
+    background: #534AB7;
+    border-color: #534AB7;
+}
+
+/* ─── Task text ─── */
+.task-text {
+    flex: 1;
+    font-size: 14px;
+    color: #111827;
+    line-height: 1.4;
+}
+
+.task-text--done {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+/* ─── Badge ─── */
+.task-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.task-badge--active {
+    background: #ede9fe;
+    color: #534AB7;
+}
+
+.task-badge--done {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+/* ─── Delete button ─── */
+.task-delete {
+    padding: 6px;
+    border: 1.5px solid #f3f4f6;
+    border-radius: 8px;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.task-delete:hover {
+    border-color: #fca5a5;
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+/* ─── Empty state ─── */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    gap: 12px;
+}
+
+.empty-icon {
+    color: #d1d5db;
+}
+
+.empty-title {
+    font-size: 14px;
+    color: #9ca3af;
+    text-align: center;
+}
+
+/* ─── Footer ─── */
+.app-footer {
+    padding: 12px 24px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 12px;
+    color: #9ca3af;
+    text-align: center;
+    background: #fafafa;
+}

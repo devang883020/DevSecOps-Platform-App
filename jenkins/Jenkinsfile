@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+ 
+        stage('Verify Server') { 
+            steps { 
+                sh 'whoami'
+                sh 'docker --version'
+                sh 'kubectl version --client' 
+            }
+        }
+
+        stage('Show Workspace') {
+            steps {
+                sh 'pwd'
+                sh 'find . -maxdepth 3'
+            }
+        }
+
+        stage('Build Frontend Docker Image') {
+            steps {
+                sh 'docker build -t frontend-test -f app/frontend/Dockerfile app/frontend'
+            }
+        }
+    }
+}

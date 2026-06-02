@@ -1,0 +1,46 @@
+# ============================================================
+# Frontend Helm Values
+# Jenkins auto-updates `image.tag` on every build
+# ============================================================
+
+replicaCount: 1
+
+namespace: frontend
+
+image:
+  repository: 975049914104.dkr.ecr.us-east-1.amazonaws.com/frontend-app
+  tag: "119"
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ecr-secret   # created manually via kubectl (ECR login secret)
+
+container:
+  port: 80             # nginx serves on port 80 inside the container
+
+service:
+  type: LoadBalancer
+  port: 80             # service exposes port 80
+
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  host: ""             # leave empty to use ALB DNS directly (no custom domain needed)
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+
+strategy:
+  type: RollingUpdate
+  maxSurge: 1
+  maxUnavailable: 0    # zero downtime — always keep pods running during deploy

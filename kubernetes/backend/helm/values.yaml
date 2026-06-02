@@ -1,0 +1,51 @@
+# ============================================================
+# Backend Helm Values
+# Jenkins auto-updates `image.tag` on every build
+# ============================================================
+
+namespace: backend
+
+replicaCount: 1
+
+image:
+  repository: 975049914104.dkr.ecr.us-east-1.amazonaws.com/backend-app
+  tag: "69"
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ecr-secret    # ECR pull secret created via kubectl
+
+container:
+  port: 3500            # Node.js/Express runs on 3500
+
+service:
+  type: ClusterIP       # internal only — frontend calls this
+  port: 3500
+
+# MongoDB connection using Kubernetes internal DNS
+# format: mongodb://<user>:<pass>@<svc-name>.<namespace>.svc.cluster.local:<port>/<db>
+mongo:
+  connStr: "mongodb://admin:password123@mongodb-svc.database.svc.cluster.local:27017/todo?authSource=admin"
+  useAuth: "true"
+  secretName: mongo-sec   # secret must exist in backend namespace
+  usernameKey: username
+  passwordKey: password
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+
+strategy:
+  type: RollingUpdate
+  maxSurge: 1
+  maxUnavailable: 0
+
+# Health check endpoints (already in your Node.js app)
+probes:
+  liveness:  /healthz
+  readiness: /ready
+  startup:   /started

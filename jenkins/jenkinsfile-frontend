@@ -1,0 +1,268 @@
+pipeline {
+
+    agent any
+
+    environment {
+
+        APP_DIR = "app/frontend"
+
+        SONAR_SCANNER = tool 'sonar-scanner'
+
+        AWS_REGION = "us-east-1"
+
+        ECR_REPO = "frontend-app"
+
+        AWS_ACCOUNT_ID = "975049914104"
+
+        ECR_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+        HELM_VALUES_FILE = "kubernetes/frontend/helm/values.yaml"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+
+            steps {
+
+                checkout scm
+            }
+        }
+
+        stage('Skip Jenkins Auto Commit') {
+
+            steps {
+
+                script {
+
+                    def commitAuthor = sh(
+                        script: "git log -1 --pretty=%an",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Latest Commit Author: ${commitAuthor}"
+
+                    if (commitAuthor == "Jenkins") {
+
+                        currentBuild.result = 'NOT_BUILT'
+
+                        error("Skipping Jenkins auto commit build")
+                    }
+                }
+            }
+        }
+
+        stage('Detect Frontend Changes') {
+
+            steps {
+
+                script {
+
+                    def frontendChanged = false
+
+                    for (changeLog in currentBuild.changeSets) {
+
+                        for (entry in changeLog.items) {
+
+                            for (file in entry.affectedFiles) {
+
+                                echo "Changed File: ${file.path}"
+
+                                if (
+                                    file.path.startsWith("app/frontend/") ||
+                                    file.path.startsWith("kubernetes/frontend/")
+                                ) {
+
+                                    frontendChanged = true
+                                }
+                            }
+                        }
+                    }
+
+                    if (!frontendChanged) {
+
+                        currentBuild.result = 'NOT_BUILT'
+
+                        error("No frontend changes detected")
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+
+            steps {
+
+                dir("${APP_DIR}") {
+
+                    withSonarQubeEnv('sonar-server') {
+
+                        sh """
+                            ${SONAR_SCANNER}/bin/sonar-scanner \
+                            -Dsonar.projectKey=frontend-app \
+                            -Dsonar.projectName=frontend-app \
+                            -Dsonar.sources=. \
+                            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+
+            steps {
+
+                timeout(time: 5, unit: 'MINUTES') {
+
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Trivy Filesystem Scan') {
+
+            steps {
+
+                dir("${APP_DIR}") {
+
+                    sh '''
+                        trivy fs . > trivy-fs-report.txt
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Frontend Folder') {
+
+            steps {
+
+                sh 'ls -la app/frontend'
+            }
+        }
+
+        stage('Build Frontend Docker Image') {
+
+            steps {
+
+                sh '''
+                    docker build -t frontend-app:${BUILD_NUMBER} \
+                    -f app/frontend/Dockerfile \
+                    app/frontend
+                '''
+            }
+        }
+
+        stage('Trivy Docker Image Scan') {
+
+            steps {
+
+                sh '''
+                    trivy image frontend-app:${BUILD_NUMBER} > trivy-image-report.txt
+                '''
+            }
+        }
+
+        stage('Login To AWS ECR') {
+
+            steps {
+
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+
+                    sh '''
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                        aws ecr get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS --password-stdin ${ECR_URI}
+                    '''
+                }
+            }
+        }
+
+        stage('Tag Docker Image') {
+
+            steps {
+
+                sh '''
+                    docker tag frontend-app:${BUILD_NUMBER} \
+                    ${ECR_URI}/${ECR_REPO}:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Push Docker Image To ECR') {
+
+            steps {
+
+                sh '''
+                    docker push ${ECR_URI}/${ECR_REPO}:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        stage('Update Helm Chart Image Tag') {
+
+            steps {
+
+                sh '''
+                    sed -i 's/tag:.*/tag: "'"${BUILD_NUMBER}"'"/' ${HELM_VALUES_FILE}
+
+                    echo "Updated Helm values.yaml"
+
+                    cat ${HELM_VALUES_FILE}
+                '''
+            }
+        }
+
+        stage('Push Updated Helm Chart To GitHub') {
+
+            steps {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'github-creds',
+                        usernameVariable: 'GITHUB_USERNAME',
+                        passwordVariable: 'GITHUB_PASSWORD'
+                    )
+                ]) {
+
+                    sh '''
+                        git config user.email "jenkins@devsecops.com"
+                        git config user.name "Jenkins"
+
+                        git add ${HELM_VALUES_FILE}
+
+                        git commit -m "Update frontend image tag to ${BUILD_NUMBER}" || true
+
+                        git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/pravinchoudhar-01/Cloud-Native-DevSecOps-Platform-App.git HEAD:master
+                    '''
+                }
+            }
+        }
+
+        stage('Frontend Docker Images') {
+
+            steps {
+
+                sh 'docker images'
+            }
+        }
+    }
+
+    post {
+
+        success {
+
+            echo 'Frontend Pipeline Completed Successfully'
+        }
+
+        failure {
+
+            echo 'Frontend Pipeline Failed'
+        }
+    }
+}

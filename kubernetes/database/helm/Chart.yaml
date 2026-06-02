@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cloud-native-database
+description: Helm chart for Cloud Native DevSecOps Database (MongoDB)
+type: application
+version: 1.0.0
+appVersion: "4.4.6"

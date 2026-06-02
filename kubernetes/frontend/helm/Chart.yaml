@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cloud-native-frontend
+description: Helm chart for Cloud Native DevSecOps Frontend (React + Nginx)
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

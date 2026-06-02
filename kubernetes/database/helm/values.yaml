@@ -1,0 +1,43 @@
+# ============================================================
+# Database Helm Values (MongoDB)
+# Unlike frontend/backend, image tag here is fixed
+# (MongoDB version only changes when you upgrade intentionally)
+# ============================================================
+
+namespace: database
+
+image:
+  repository: mongo
+  tag: "4.4.6"          # change this to upgrade MongoDB version
+  pullPolicy: IfNotPresent
+
+container:
+  port: 27017
+
+service:
+  name: mongodb-svc     # backend uses this name in MONGO_CONN_STR
+  port: 27017
+
+# MongoDB credentials
+# These match the secret created via kubectl manually
+# DO NOT push real credentials to GitHub
+secret:
+  name: mongo-sec
+  usernameKey: username
+  passwordKey: password
+
+# Persistent Volume — stores MongoDB data on the node disk
+# If pod restarts, data is preserved
+storage:
+  pvName: mongo-pv
+  pvcName: mongo-volume-claim
+  size: 1Gi
+  hostPath: /data/db    # path on the EKS worker node
+
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
